@@ -62,8 +62,26 @@ class Cube
     z = point.z
 
     # rotation over Y
-    x = point.x * Math.cos(@rotation.y) - point.z * Math.sin(@rotation.y)
-    z = point.x * Math.sin(@rotation.y) + point.z * Math.cos(@rotation.y)
+
+    dup_x = x
+    dup_z = z
+
+    x = dup_x * Math.cos(@rotation.y) - dup_z * Math.sin(@rotation.y)
+    z = dup_x * Math.sin(@rotation.y) + dup_z * Math.cos(@rotation.y)
+
+    # rotation over X
+    dup_z = z
+    dup_y = y
+
+    z = dup_z * Math.cos(@rotation.x) - dup_y * Math.sin(@rotation.x)
+    y = dup_z * Math.sin(@rotation.x) + dup_y * Math.cos(@rotation.x)
+
+    # rotation over Z
+    dup_x = x
+    dup_y = y
+
+    x = dup_x * Math.cos(@rotation.z) - dup_y * Math.sin(@rotation.z)
+    y = dup_x * Math.sin(@rotation.z) + dup_y * Math.cos(@rotation.z)
 
     # translation
     Point.new(x + @position.x, y + @position.y, z + @position.z)
