@@ -32,6 +32,10 @@ class GameWindow < Gosu::Window
     if button_down? Gosu::KbDown
       @cube.position.y -= @velocity
     end
+
+    if button_down? Gosu::KbA
+      @cube.rotation.y += 0.1
+    end
   end
 
   def button_down(id)

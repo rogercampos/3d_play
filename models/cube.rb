@@ -12,7 +12,7 @@ class Cube
   attr_accessor :rotation
   attr_reader :edges
 
-  def initialize(size, position, rotation = Vector.new(0, 0, 0))
+  def initialize(size, position, rotation = Angle.new(0, 0, 0))
     @points = []
     @position = position
     @rotation = rotation
@@ -47,18 +47,25 @@ class Cube
   end
 
   def world_points
-    points.map do |point|
-      # translate using current position
-      Point.new point.x + @position.x, point.y + @position.y, point.z + @position.z
-
-      # TODO: Rotation
-    end
+    points.map { |point| transform(point) }
   end
 
   def world_edges
-    edges.map do |edge|
-      Edge.new Point.new(edge.a.x + @position.x, edge.a.y + @position.y, edge.a.z + @position.z),
-               Point.new(edge.b.x + @position.x, edge.b.y + @position.y, edge.b.z + @position.z)
-    end
+    edges.map { |edge| Edge.new(transform(edge.a), transform(edge.b)) }
+  end
+
+  private
+
+  def transform(point)
+    x = point.x
+    y = point.y
+    z = point.z
+
+    # rotation over Y
+    x = point.x * Math.cos(@rotation.y) - point.z * Math.sin(@rotation.y)
+    z = point.x * Math.sin(@rotation.y) + point.z * Math.cos(@rotation.y)
+
+    # translation
+    Point.new(x + @position.x, y + @position.y, z + @position.z)
   end
 end
