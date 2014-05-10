@@ -13,6 +13,7 @@ class GameWindow < Gosu::Window
     @camera = Camera.new Point.new(10, 0, 0), Vector.new(0, 0, 1)
 
     @velocity = 0.1
+    @fov = 800.0
   end
 
   def update
@@ -39,27 +40,45 @@ class GameWindow < Gosu::Window
     end
   end
 
+  def draw_point(x, y)
+    draw_triangle x-5, y-5, Gosu::Color::WHITE, x, y, Gosu::Color::WHITE, x, y-5, Gosu::Color::WHITE
+  end
+
   def draw
-    @cube.world_points.each do |point|
-      x, y = calculate_object_screen_coords(point)
+    # draw_cube_points
+    draw_cube_edges
+  end
 
-      # Y dimension goes up in 3d-world by down in screen-world
-      y = -y
+  def draw_cube_edges
+    @cube.world_edges.each do |edge|
+      x0, y0, x1, y1 = [edge.a, edge.b].map do |point|
+        screen_coords_from_point(point)
+      end.flatten
 
-      # Position the camera at the center of the screen
-      x = x + @screen_width / 2
-      y = y + @screen_height / 2
-
-      draw_triangle x-5, y-5, Gosu::Color::WHITE, x, y, Gosu::Color::WHITE, x, y+5, Gosu::Color::WHITE
+      draw_line x0, y0, Gosu::Color::WHITE, x1, y1, Gosu::Color::WHITE
     end
   end
 
+  def draw_cube_points
+    @cube.world_points.each do |point|
+      x, y = screen_coords_from_point(point)
+      draw_point x, y
+    end
+  end
+
+  def screen_coords_from_point(point)
+    x, y = calculate_object_screen_coords(point)
+
+    # Y dimension goes up in 3d-world by down in screen-world
+    y = -y
+
+    # Position the camera at the center of the screen
+    [x + @screen_width / 2, y + @screen_height / 2]
+  end
+
   def calculate_object_screen_coords(point)
-    fov = 800.0
-
     real_point = @camera.transform(point)
-
-    [real_point.x * fov / real_point.z, real_point.y * fov / real_point.z]
+    [real_point.x * @fov / real_point.z, real_point.y * @fov / real_point.z]
   end
 end
 
